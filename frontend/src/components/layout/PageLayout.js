@@ -4,11 +4,11 @@ import Header from './Header';
 
 export const PageLayout = ({ title, children }) => {
   return (
-    <div className="page-layout">
+    <div className="min-h-screen bg-surface flex">
       <Sidebar />
-      <div className="layout-main">
+      <div className="flex-1 flex flex-col">
         <Header title={title} />
-        <div className="layout-content">{children}</div>
+        <main className="p-6">{children}</main>
       </div>
     </div>
   );

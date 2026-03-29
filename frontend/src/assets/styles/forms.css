@@ -20,6 +20,8 @@ input[type='tel'],
 input[type='number'],
 textarea,
 select {
+  box-sizing: border-box;
+  width: 100%;
   padding: var(--spacing-md) var(--spacing-md);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);

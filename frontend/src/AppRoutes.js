@@ -1,34 +1,34 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import ProtectedRoute from '../components/common/ProtectedRoute';
+import ProtectedRoute from './components/common/ProtectedRoute';
 
 // Auth Pages
-import LoginPage from '../pages/auth/LoginPage';
+import LoginPage from './pages/auth/LoginPage';
 
 // Admin Pages
-import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
-import DistributorListPage from '../pages/admin/DistributorListPage';
-import RetailerListPage from '../pages/admin/RetailerListPage';
-import UserFormPage from '../pages/admin/UserFormPage';
-import WalletManagementPage from '../pages/admin/WalletManagementPage';
-import TransactionManagementPage from '../pages/admin/TransactionManagementPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import DistributorListPage from './pages/admin/DistributorListPage';
+import RetailerListPage from './pages/admin/RetailerListPage';
+import UserFormPage from './pages/admin/UserFormPage';
+import WalletManagementPage from './pages/admin/WalletManagementPage';
+import TransactionManagementPage from './pages/admin/TransactionManagementPage';
 
 // Distributor Pages
-import DistributorDashboardPage from '../pages/distributor/DistributorDashboardPage';
-import DistributorRetailersPage from '../pages/distributor/DistributorRetailersPage';
-import DistributorRetailerFormPage from '../pages/distributor/DistributorRetailerFormPage';
-import DistributorWalletPage from '../pages/distributor/DistributorWalletPage';
-import DistributorTransactionsPage from '../pages/distributor/DistributorTransactionsPage';
+import DistributorDashboardPage from './pages/distributor/DistributorDashboardPage';
+import DistributorRetailersPage from './pages/distributor/DistributorRetailersPage';
+import DistributorRetailerFormPage from './pages/distributor/DistributorRetailerFormPage';
+import DistributorWalletPage from './pages/distributor/DistributorWalletPage';
+import DistributorTransactionsPage from './pages/distributor/DistributorTransactionsPage';
 
 // Retailer Pages
-import RetailerDashboardPage from '../pages/retailer/RetailerDashboardPage';
-import RetailerWalletPage from '../pages/retailer/RetailerWalletPage';
-import RetailerTransactionsPage from '../pages/retailer/RetailerTransactionsPage';
-import CreateTransactionPage from '../pages/retailer/CreateTransactionPage';
+import RetailerDashboardPage from './pages/retailer/RetailerDashboardPage';
+import RetailerWalletPage from './pages/retailer/RetailerWalletPage';
+import RetailerTransactionsPage from './pages/retailer/RetailerTransactionsPage';
+import CreateTransactionPage from './pages/retailer/CreateTransactionPage';
 
 // Profile Pages
-import ProfilePage from '../pages/profile/ProfilePage';
-import ChangePasswordPage from '../pages/profile/ChangePasswordPage';
+import ProfilePage from './pages/profile/ProfilePage';
+import ChangePasswordPage from './pages/profile/ChangePasswordPage';
 
 export const AppRoutes = () => {
   return (

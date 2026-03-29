@@ -32,37 +32,79 @@ export const RetailerDashboardPage = () => {
     { key: 'customerName', label: 'Customer' },
     { key: 'type', label: 'Type' },
     { key: 'amount', label: 'Amount', render: (row) => formatCurrency(row.amount) },
-    { 
-      key: 'status', 
+    {
+      key: 'status',
       label: 'Status',
-      render: (row) => <span className={`table-status status-${row.status}`}>{row.status}</span>
+      render: (row) => {
+        const s = (row.status || '').toLowerCase();
+        const cls = s === 'success' ? 'bg-green-100 text-green-800' : s === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800';
+        return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>{row.status}</span>;
+      }
     },
     { key: 'createdAt', label: 'Date', render: (row) => formatDate(row.createdAt) },
   ];
 
   return (
     <PageLayout title="Retailer Dashboard">
-      {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--spacing-lg)' }}>{error}</div>}
-      
-      <div className="dashboard-cards">
-        <Card>
-          <div className="card-title">My Wallet Balance</div>
-          <div className="card-value">{formatCurrency(data?.ownWalletBalance || 0)}</div>
-        </Card>
-        <Card>
-          <div className="card-title">Total Transactions</div>
-          <div className="card-value">{data?.ownTransactionCount || 0}</div>
-        </Card>
-      </div>
+      {error && <div className="text-red-600 mb-6">{error}</div>}
 
-      <div style={{ marginTop: 'var(--spacing-2xl)' }}>
-        <Card title="Recent Transactions">
-          <Table 
-            columns={transactionColumns} 
-            data={data?.recentTransactions || []}
-            emptyMessage="No transactions yet"
-          />
-        </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Card>
+              <div className="flex items-center gap-4">
+                <div className="text-2xl">💳</div>
+                <div>
+                  <div className="text-sm text-gray-500">My Wallet</div>
+                  <div className="text-2xl font-semibold">{formatCurrency(data?.ownWalletBalance || 0)}</div>
+                  <div className="text-sm text-gray-400">Available balance</div>
+                </div>
+              </div>
+            </Card>
+
+            <Card>
+              <div className="flex items-center gap-4">
+                <div className="text-2xl">📄</div>
+                <div>
+                  <div className="text-sm text-gray-500">Transactions</div>
+                  <div className="text-2xl font-semibold">{data?.ownTransactionCount || 0}</div>
+                  <div className="text-sm text-gray-400">This month</div>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <div className="mt-8">
+            <Card title="Recent Transactions">
+              <Table 
+                columns={transactionColumns} 
+                data={data?.recentTransactions || []}
+                emptyMessage="No transactions yet"
+              />
+            </Card>
+          </div>
+        </div>
+
+        <aside className="lg:col-span-1 space-y-4">
+          <Card title="Quick Actions">
+            <div className="flex flex-col gap-3">
+              <button className="table-action-btn table-action-btn-primary">Create Transaction</button>
+              <button className="table-action-btn table-action-btn-secondary">View Ledger</button>
+            </div>
+          </Card>
+
+          <Card title="Recent Activity">
+            <div className="flex flex-col gap-3 text-sm text-gray-600">
+              {(data?.activity || []).slice(0,6).map((a) => (
+                <div key={a._id || a.id}>
+                  <div className="font-medium text-gray-800">{a.title || a.message}</div>
+                  <div className="text-xs text-gray-400">{formatDate(a.createdAt)}</div>
+                </div>
+              ))}
+              {!data?.activity?.length && <div className="text-gray-500">No recent activity</div>}
+            </div>
+          </Card>
+        </aside>
       </div>
     </PageLayout>
   );

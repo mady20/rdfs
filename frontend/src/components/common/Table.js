@@ -3,32 +3,30 @@ import React from 'react';
 export const Table = ({ columns = [], data = [], renderActions, emptyMessage = 'No data found' }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="table-empty">
+      <div className="text-center p-6 text-on-surface-variant">
         <p>{emptyMessage}</p>
       </div>
     );
   }
 
   return (
-    <div className="table-responsive">
-      <table>
-        <thead>
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white rounded-lg">
+        <thead className="bg-surface-container">
           <tr>
             {columns.map((col) => (
-              <th key={col.key}>{col.label}</th>
+              <th key={col.key} className="text-left px-4 py-3 text-sm font-semibold text-on-surface">{col.label}</th>
             ))}
-            {renderActions && <th>Actions</th>}
+            {renderActions && <th className="px-4 py-3 text-left text-sm font-semibold">Actions</th>}
           </tr>
         </thead>
         <tbody>
           {data.map((row, idx) => (
-            <tr key={row._id || idx}>
+            <tr key={row._id || idx} className="hover:bg-surface-bright">
               {columns.map((col) => (
-                <td key={col.key}>
-                  {col.render ? col.render(row) : row[col.key]}
-                </td>
+                <td key={col.key} className="px-4 py-3 text-sm text-on-surface">{col.render ? col.render(row) : row[col.key]}</td>
               ))}
-              {renderActions && <td>{renderActions(row)}</td>}
+              {renderActions && <td className="px-4 py-3">{renderActions(row)}</td>}
             </tr>
           ))}
         </tbody>

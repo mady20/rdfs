@@ -45,10 +45,14 @@ export const AdminDashboardPage = () => {
       label: 'Amount',
       render: (row) => formatCurrency(row.amount)
     },
-    { 
-      key: 'status', 
+    {
+      key: 'status',
       label: 'Status',
-      render: (row) => <span className={`table-status status-${row.status}`}>{row.status}</span>
+      render: (row) => {
+        const s = (row.status || '').toLowerCase();
+        const cls = s === 'success' ? 'bg-green-100 text-green-800' : s === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800';
+        return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>{row.status}</span>;
+      }
     },
     { 
       key: 'createdAt', 
@@ -59,35 +63,88 @@ export const AdminDashboardPage = () => {
 
   return (
     <PageLayout title="Admin Dashboard">
-      {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--spacing-lg)' }}>{error}</div>}
-      
-      <div className="dashboard-cards">
-        <Card>
-          <div className="card-title">Total Users</div>
-          <div className="card-value">{data?.totalUsers || 0}</div>
-        </Card>
-        <Card>
-          <div className="card-title">Total Distributors</div>
-          <div className="card-value">{data?.totalDistributors || 0}</div>
-        </Card>
-        <Card>
-          <div className="card-title">Total Retailers</div>
-          <div className="card-value">{data?.totalRetailers || 0}</div>
-        </Card>
-        <Card>
-          <div className="card-title">Total Wallet Balance</div>
-          <div className="card-value">{formatCurrency(data?.totalWalletBalance || 0)}</div>
-        </Card>
-      </div>
+      {error && <div className="text-red-600 mb-6">{error}</div>}
 
-      <div style={{ marginTop: 'var(--spacing-2xl)' }}>
-        <Card title="Recent Transactions">
-          <Table 
-            columns={transactionColumns} 
-            data={data?.recentTransactions || []}
-            emptyMessage="No transactions yet"
-          />
-        </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Card>
+              <div className="flex items-center gap-4">
+                <div className="text-2xl">👥</div>
+                <div>
+                  <div className="text-sm text-gray-500">Total Users</div>
+                  <div className="text-2xl font-semibold">{data?.totalUsers || 0}</div>
+                  <div className="text-sm text-gray-400">All roles combined</div>
+                </div>
+              </div>
+            </Card>
+
+            <Card>
+              <div className="flex items-center gap-4">
+                <div className="text-2xl">🏢</div>
+                <div>
+                  <div className="text-sm text-gray-500">Distributors</div>
+                  <div className="text-2xl font-semibold">{data?.totalDistributors || 0}</div>
+                  <div className="text-sm text-gray-400">Active partners</div>
+                </div>
+              </div>
+            </Card>
+
+            <Card>
+              <div className="flex items-center gap-4">
+                <div className="text-2xl">🛒</div>
+                <div>
+                  <div className="text-sm text-gray-500">Retailers</div>
+                  <div className="text-2xl font-semibold">{data?.totalRetailers || 0}</div>
+                  <div className="text-sm text-gray-400">Point-of-sale outlets</div>
+                </div>
+              </div>
+            </Card>
+
+            <Card>
+              <div className="flex items-center gap-4">
+                <div className="text-2xl">💰</div>
+                <div>
+                  <div className="text-sm text-gray-500">Wallet Balance</div>
+                  <div className="text-2xl font-semibold">{formatCurrency(data?.totalWalletBalance || 0)}</div>
+                  <div className="text-sm text-gray-400">System-wide balance</div>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <div className="mt-8">
+            <Card title="Recent Transactions">
+              <Table 
+                columns={transactionColumns} 
+                data={data?.recentTransactions || []}
+                emptyMessage="No transactions yet"
+              />
+            </Card>
+          </div>
+        </div>
+
+        <aside className="lg:col-span-1 space-y-4">
+          <Card title="Quick Actions">
+            <div className="flex flex-col gap-3">
+              <button className="table-action-btn table-action-btn-primary">Create Distributor</button>
+              <button className="table-action-btn table-action-btn-secondary">Create Retailer</button>
+              <button className="table-action-btn table-action-btn-secondary">Adjust Wallet</button>
+            </div>
+          </Card>
+
+          <Card title="Recent Activity">
+            <div className="flex flex-col gap-3 text-sm text-gray-600">
+              {(data?.activity || []).slice(0,6).map((a) => (
+                <div key={a._id || a.id}>
+                  <div className="font-medium text-gray-800">{a.title || a.message}</div>
+                  <div className="text-xs text-gray-400">{formatDate(a.createdAt)}</div>
+                </div>
+              ))}
+              {!data?.activity?.length && <div className="text-gray-500">No recent activity</div>}
+            </div>
+          </Card>
+        </aside>
       </div>
     </PageLayout>
   );

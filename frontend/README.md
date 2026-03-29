@@ -27,6 +27,8 @@ npm start
 
 The application will open at `http://localhost:3000`
 
+Note: This project now uses Tailwind CSS. Post-install, the build will run PostCSS with Tailwind.
+
 ## Project Structure
 
 ```
@@ -115,8 +117,17 @@ This is configured in `src/api/axios.js`
 ## Demo Credentials
 
 ### Admin
-- Email: admin@vestapay.com
-- Password: admin123
+### Admin
+- Email: admin@example.com
+- Password: Admin@123
+
+### Distributor
+- Email: distributor@example.com
+- Password: Distributor@123
+
+### Retailer
+- Email: retailer@example.com
+- Password: Retailer@123
 
 ### Distributor
 - Email: distributor@vestapay.com

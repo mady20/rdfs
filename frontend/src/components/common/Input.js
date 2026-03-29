@@ -27,9 +27,7 @@ export const Input = ({
         onChange={onChange}
         placeholder={placeholder}
         disabled={disabled}
-        style={{
-          borderColor: error ? 'var(--error)' : 'var(--border)',
-        }}
+        className={`w-full px-3 py-2 border rounded-md bg-surface-bright text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary ${error ? 'border-error' : 'border-border'}`}
       />
       {error && <span className="form-error-message">{error}</span>}
     </div>

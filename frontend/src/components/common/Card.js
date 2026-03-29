@@ -2,25 +2,9 @@ import React from 'react';
 
 export const Card = ({ title, children, className = '' }) => {
   return (
-    <div
-      className={`card ${className}`}
-      style={{
-        backgroundColor: 'white',
-        border: '1px solid var(--border)',
-        borderRadius: 'var(--radius-lg)',
-        padding: 'var(--spacing-xl)',
-        boxShadow: 'var(--shadow-sm)',
-      }}
-    >
+    <div className={`card-base ${className}`}>
       {title && (
-        <h3
-          style={{
-            marginBottom: 'var(--spacing-lg)',
-            marginTop: 0,
-            fontSize: 'var(--font-size-lg)',
-            fontWeight: 600,
-          }}
-        >
+        <h3 className="text-lg font-semibold mb-4">
           {title}
         </h3>
       )}

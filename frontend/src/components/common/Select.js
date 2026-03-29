@@ -24,9 +24,7 @@ export const Select = ({
         value={value}
         onChange={onChange}
         disabled={disabled}
-        style={{
-          borderColor: error ? 'var(--error)' : 'var(--border)',
-        }}
+        className={`w-full px-3 py-2 border rounded-md bg-surface-bright text-on-surface focus:outline-none focus:border-primary ${error ? 'border-error' : 'border-border'}`}
       >
         <option value="">-- Select Option --</option>
         {options.map((opt) => (

@@ -115,7 +115,12 @@ export const WalletManagementPage = () => {
 
   return (
     <PageLayout title="Wallet Management">
-      {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--spacing-lg)' }}>{error}</div>}
+      {error && (
+        <div className="bg-error/10 text-error px-4 py-3 rounded-xl mb-6 flex items-center gap-3 border border-error/20 animate-fade-in">
+          <span className="text-xl">⚠️</span>
+          <span className="text-sm font-semibold">{error}</span>
+        </div>
+      )}
 
       <Card title="All Wallets">
         <Table 
@@ -135,34 +140,39 @@ export const WalletManagementPage = () => {
           setLedgerData([]);
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-          <div>
-            <strong>Current Balance: </strong>
-            {formatCurrency(selectedWallet?.balance || 0)}
+        <div className="flex flex-col gap-5">
+          <div className="bg-surface-bright p-4 rounded-xl border border-border flex justify-between items-center">
+            <strong className="text-on-surface-variant font-medium">Current Balance:</strong>
+            <span className="text-xl font-bold text-primary">{formatCurrency(selectedWallet?.balance || 0)}</span>
           </div>
 
-          <Select
-            label="Type"
-            value={adjustType}
-            onChange={(e) => setAdjustType(e.target.value)}
-            options={[
-              { label: 'Credit', value: 'credit' },
-              { label: 'Debit', value: 'debit' },
-            ]}
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Select
+              label="Type"
+              value={adjustType}
+              onChange={(e) => setAdjustType(e.target.value)}
+              options={[
+                { label: 'Credit', value: 'credit' },
+                { label: 'Debit', value: 'debit' },
+              ]}
+              required
+            />
 
-          <Input
-            label="Amount"
-            type="number"
-            value={adjustAmount}
-            onChange={(e) => setAdjustAmount(e.target.value)}
-            required
-          />
+            <Input
+              label="Amount"
+              type="number"
+              value={adjustAmount}
+              onChange={(e) => setAdjustAmount(e.target.value)}
+              placeholder="0.00"
+              required
+            />
+          </div>
 
           <Input
             label="Description"
             value={adjustDescription}
             onChange={(e) => setAdjustDescription(e.target.value)}
+            placeholder="Reason for adjustment"
             required
           />
 
@@ -170,12 +180,13 @@ export const WalletManagementPage = () => {
             variant="primary" 
             onClick={handleAdjustWallet}
             disabled={adjusting}
+            className="w-full py-3 text-base"
           >
-            {adjusting ? 'Processing...' : 'Adjust'}
+            {adjusting ? 'Processing...' : 'Confirm Adjustment'}
           </Button>
 
-          <div style={{ marginTop: 'var(--spacing-lg)' }}>
-            <h4>Recent Ledger Entries</h4>
+          <div className="mt-6 pt-6 border-t border-border/50">
+            <h4 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Recent Ledger Entries</h4>
             <Table 
               columns={ledgerColumns} 
               data={ledgerData.slice(0, 5)}

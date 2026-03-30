@@ -72,78 +72,81 @@ export const ProfilePage = () => {
 
   return (
     <PageLayout title="My Profile">
-      <Card>
+      <Card className="max-w-2xl mx-auto shadow-md">
         {error && (
-          <div
-            style={{
-              backgroundColor: 'rgba(186, 26, 26, 0.1)',
-              color: 'var(--error)',
-              padding: 'var(--spacing-md)',
-              borderRadius: 'var(--radius-md)',
-              marginBottom: 'var(--spacing-lg)',
-            }}
-          >
-            {error}
+          <div className="bg-error/10 text-error px-4 py-3 rounded-xl mb-6 flex items-center gap-3 border border-error/20 animate-fade-in">
+            <span className="text-xl">⚠️</span>
+            <span className="text-sm font-semibold">{error}</span>
           </div>
         )}
 
         {success && (
-          <div
-            style={{
-              backgroundColor: 'rgba(34, 197, 94, 0.1)',
-              color: '#22c55e',
-              padding: 'var(--spacing-md)',
-              borderRadius: 'var(--radius-md)',
-              marginBottom: 'var(--spacing-lg)',
-            }}
-          >
-            {success}
+          <div className="bg-green-100/50 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 border border-green-200 animate-fade-in">
+            <span className="text-xl">✅</span>
+            <span className="text-sm font-semibold">{success}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <Input
-            label="Name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex items-center gap-4 mb-2 pb-6 border-b border-border/50">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl font-bold uppercase">
+              {formData.name.charAt(0) || user?.email?.charAt(0) || 'U'}
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-on-surface">{formData.name || 'User Profile'}</h3>
+              <p className="text-sm text-on-surface-variant capitalize">{formData.role} Account</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Full Name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Your full name"
+              required
+            />
+            <Input
+              label="Email Address"
+              name="email"
+              type="email"
+              value={formData.email}
+              disabled
+              className="opacity-70 cursor-not-allowed bg-surface-dim"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Phone Number"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="+1234567890"
+            />
+            <Input
+              label="Account Role"
+              name="role"
+              value={formData.role.charAt(0).toUpperCase() + formData.role.slice(1)}
+              disabled
+              className="opacity-70 cursor-not-allowed bg-surface-dim capitalize"
+            />
+          </div>
 
           <Input
-            label="Email"
-            name="email"
-            type="email"
-            value={formData.email}
-            disabled
-            style={{ opacity: 0.6 }}
-          />
-
-          <Input
-            label="Phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-          />
-
-          <Input
-            label="Address"
+            label="Physical Address"
             name="address"
             value={formData.address}
             onChange={handleChange}
+            placeholder="Full physical address"
           />
 
-          <Input
-            label="Role"
-            name="role"
-            value={formData.role}
-            disabled
-            style={{ opacity: 0.6 }}
-          />
-
-          <Button variant="primary" type="submit" disabled={submitting}>
-            {submitting ? 'Saving...' : 'Save Changes'}
-          </Button>
+          <div className="pt-4 mt-2 border-t border-border/50">
+            <Button variant="primary" type="submit" disabled={submitting} className="w-full sm:w-auto px-8 py-3 text-base">
+              {submitting ? 'Saving Changes...' : 'Save Profile Changes'}
+            </Button>
+          </div>
         </form>
       </Card>
     </PageLayout>

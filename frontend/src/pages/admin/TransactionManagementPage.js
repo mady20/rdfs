@@ -120,13 +120,17 @@ export const TransactionManagementPage = () => {
     { 
       key: 'status', 
       label: 'Status',
-      render: (row) => <span className={`table-status status-${row.status}`}>{row.status}</span>
+      render: (row) => {
+        const s = (row.status || '').toLowerCase();
+        const cls = s === 'success' ? 'bg-green-100 text-green-800 border-green-200' : s === 'pending' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 'bg-red-100 text-red-800 border-red-200';
+        return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide border ${cls}`}>{row.status}</span>;
+      }
     },
     { key: 'createdAt', label: 'Date', render: (row) => formatDate(row.createdAt) },
   ];
 
   const renderActions = (row) => (
-    <div className="table-actions">
+    <div className="flex items-center gap-2">
       <Button variant="secondary" onClick={() => handleOpenStatusModal(row)}>
         Change Status
       </Button>
@@ -138,37 +142,44 @@ export const TransactionManagementPage = () => {
 
   return (
     <PageLayout title="Transaction Management">
-      {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--spacing-lg)' }}>{error}</div>}
+      {error && (
+        <div className="bg-error/10 text-error px-4 py-3 rounded-xl mb-6 flex items-center gap-3 border border-error/20 animate-fade-in">
+          <span className="text-xl">⚠️</span>
+          <span className="text-sm font-semibold">{error}</span>
+        </div>
+      )}
 
       <Card>
-        <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)' }}>
-          <Select
-            label="Filter by Type"
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            options={[
-              { label: 'All Types', value: '' },
-              ...TRANSACTION_TYPES.map((t) => ({ label: t, value: t })),
-            ]}
-            style={{ maxWidth: '200px' }}
-          />
-          <Select
-            label="Filter by Status"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            options={[
-              { label: 'All Status', value: '' },
-              ...TRANSACTION_STATUS.map((s) => ({ label: s, value: s })),
-            ]}
-            style={{ maxWidth: '200px' }}
-          />
+        <div className="flex flex-col sm:flex-row gap-4 mb-6 bg-surface-bright p-4 rounded-xl border border-border items-end">
+          <div className="flex-1 w-full max-w-[200px]">
+            <Select
+              label="Filter by Type"
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              options={[
+                { label: 'All Types', value: '' },
+                ...TRANSACTION_TYPES.map((t) => ({ label: t, value: t })),
+              ]}
+            />
+          </div>
+          <div className="flex-1 w-full max-w-[200px]">
+            <Select
+              label="Filter by Status"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              options={[
+                { label: 'All Status', value: '' },
+                ...TRANSACTION_STATUS.map((s) => ({ label: s, value: s })),
+              ]}
+            />
+          </div>
         </div>
 
         <Table 
           columns={columns} 
           data={filteredData}
           renderActions={renderActions}
-          emptyMessage="No transactions found"
+          emptyMessage="No transactions found matching the selected filters"
         />
       </Card>
 
@@ -180,29 +191,39 @@ export const TransactionManagementPage = () => {
           setSelectedTransaction(null);
         }}
       >
-        <Select
-          label="New Status"
-          value={newStatus}
-          onChange={(e) => setNewStatus(e.target.value)}
-          options={TRANSACTION_STATUS.map((s) => ({ label: s, value: s }))}
-        />
-        <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-lg)' }}>
-          <Button 
-            variant="primary" 
-            onClick={handleUpdateStatus}
-            disabled={updating}
-          >
-            {updating ? 'Updating...' : 'Update'}
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              setShowModal(false);
-              setSelectedTransaction(null);
-            }}
-          >
-            Cancel
-          </Button>
+        <div className="flex flex-col gap-6">
+          <div className="bg-surface-container/50 p-4 rounded-xl border border-border">
+            <div className="text-sm text-on-surface-variant font-medium mb-1">Transaction Ref:</div>
+            <div className="font-semibold text-on-surface">{selectedTransaction?.referenceId}</div>
+          </div>
+          
+          <Select
+            label="New Status"
+            value={newStatus}
+            onChange={(e) => setNewStatus(e.target.value)}
+            options={TRANSACTION_STATUS.map((s) => ({ label: s, value: s }))}
+          />
+          
+          <div className="flex items-center gap-3 mt-4 pt-4 border-t border-border/50">
+            <Button 
+              variant="primary" 
+              onClick={handleUpdateStatus}
+              disabled={updating}
+              className="flex-1"
+            >
+              {updating ? 'Updating...' : 'Update Status'}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowModal(false);
+                setSelectedTransaction(null);
+              }}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+          </div>
         </div>
       </Modal>
     </PageLayout>

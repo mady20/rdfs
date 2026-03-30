@@ -38,141 +38,84 @@ export const LoginPage = () => {
     }
   };
 
-  const fillCredentials = (email, password) => {
+  const fillCredentialsAndSubmit = async (email, password) => {
     setFormData({ email, password });
+    setError('');
+    setLoading(true);
+
+    try {
+      await login(email, password);
+      const response = await axiosInstance.get('/auth/me');
+      const userRole = response.data.data.role;
+
+      if (userRole === 'admin') navigate('/admin/dashboard');
+      else if (userRole === 'distributor') navigate('/distributor/dashboard');
+      else navigate('/retailer/dashboard');
+    } catch (err) {
+      setError(apiErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', fontFamily: 'Inter, system-ui, sans-serif' }}>
-      {/* Left Side - Gradient */}
-      <div
-        style={{
-          flex: '1',
-          background: 'linear-gradient(135deg, #3525cd 0%, #5640e6 100%)',
-          display: 'none',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 'var(--spacing-2xl)',
-          '@media (minWidth: 768px)': { display: 'flex' },
-        }}
-      >
-        <div style={{ textAlign: 'center', color: 'white', maxWidth: '400px' }}>
-          <div
-            style={{
-              fontSize: '64px',
-              marginBottom: 'var(--spacing-lg)',
-              fontWeight: 'bold',
-            }}
-          >
-            💰
+    <div className="min-h-screen flex font-body bg-surface text-on-surface">
+      {/* Left Side - Modern Abstract Gradient */}
+      <div className="hidden md:flex flex-1 relative flex-col items-center justify-center p-12 overflow-hidden bg-white">
+        {/* Background Gradients */}
+        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-primary-light/40 to-surface pointer-events-none" />
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-primary-dark/20 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 text-center max-w-md animate-fade-in text-on-surface">
+          <div className="text-7xl mb-8 transform hover:scale-110 transition-transform duration-300">
+            💸
           </div>
-          <h2 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: 'var(--spacing-md)' }}>
-            Welcome to VestaPay
+          <h2 className="text-4xl font-headline font-bold mb-4 tracking-tight">
+            Welcome to <span className="text-primary bg-clip-text">VestaPay</span>
           </h2>
-          <p style={{ fontSize: '16px', opacity: 0.9, lineHeight: 1.6 }}>
-            Secure, efficient fintech platform for managing your finances with role-based access and real-time transactions.
+          <p className="text-lg opacity-80 leading-relaxed text-on-surface-variant font-medium">
+            A secure, efficient fintech platform designed for seamless financial management and real-time transaction tracking.
           </p>
         </div>
       </div>
 
-      {/* Right Side - Form */}
-      <div
-        style={{
-          flex: '1',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: 'var(--surface)',
-          padding: 'var(--spacing-lg)',
-        }}
-      >
-        <div style={{ width: '100%', maxWidth: '420px' }}>
+      {/* Right Side - Form Container */}
+      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-surface-bright/50 backdrop-blur-md z-10 shadow-[-20px_0_40px_-20px_rgba(0,0,0,0.05)] border-l border-border/40 relative">
+        <div className="w-full max-w-md bg-white p-10 rounded-3xl shadow-xl shadow-primary/5 border border-border/50 animate-slide-up">
           {/* Header */}
-          <div style={{ marginBottom: 'var(--spacing-2xl)' }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: 'var(--spacing-lg)',
-              }}
-            >
-              <div
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #3525cd 0%, #5640e6 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '24px',
-                  fontWeight: 'bold',
-                  color: 'white',
-                }}
-              >
-                ₹
-              </div>
+          <div className="mb-10 text-center flex flex-col items-center">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary-dark shadow-lg shadow-primary/30 flex items-center justify-center text-4xl font-bold text-white mb-6 transform -rotate-3 hover:rotate-3 transition-transform">
+              ₹
             </div>
-            <h1
-              style={{
-                marginBottom: 'var(--spacing-sm)',
-                color: 'var(--on-surface)',
-                fontSize: '24px',
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}
-            >
-              VestaPay
+            <h1 className="text-3xl font-headline font-extrabold text-on-surface mb-2 tracking-tight">
+              Sign In
             </h1>
-            <p
-              style={{
-                textAlign: 'center',
-                color: 'var(--on-surface-variant)',
-                fontSize: '14px',
-                margin: 0,
-              }}
-            >
-              Internal Finance Platform
+            <p className="text-on-surface-variant text-sm font-medium">
+              VestaPay Internal Access
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div
-              style={{
-                backgroundColor: '#ffebee',
-                color: 'var(--error)',
-                padding: 'var(--spacing-md)',
-                borderRadius: 'var(--radius-md)',
-                marginBottom: 'var(--spacing-lg)',
-                fontSize: '14px',
-                border: '1px solid rgba(186, 26, 26, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--spacing-md)',
-              }}
-            >
-              <span style={{ fontSize: '18px' }}>⚠️</span>
-              <span>{error}</span>
+            <div className="bg-error/10 text-error px-4 py-3 rounded-xl mb-8 flex items-center gap-3 border border-error/20 animate-fade-in backdrop-blur-sm">
+              <span className="text-xl">⚠️</span>
+              <span className="text-sm font-semibold">{error}</span>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} style={{ marginBottom: 'var(--spacing-2xl)' }}>
+          <form onSubmit={handleSubmit} className="mb-10 flex flex-col gap-2">
             <Input
               label="Email Address"
               name="email"
               type="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="admin@example.com"
+              placeholder="name@vestapay.com"
               required
             />
-
-            <div style={{ marginBottom: 'var(--spacing-lg)' }}>
+            <div className="mb-6">
               <Input
                 label="Password"
                 name="password"
@@ -183,177 +126,66 @@ export const LoginPage = () => {
                 required
               />
             </div>
-
             <Button
               variant="primary"
               type="submit"
               disabled={loading}
-              style={{
-                width: '100%',
-                padding: 'var(--spacing-md)',
-                fontSize: '16px',
-                fontWeight: '600',
-                borderRadius: 'var(--radius-md)',
-                border: 'none',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                background: loading ? '#ccc' : 'linear-gradient(135deg, #3525cd 0%, #5640e6 100%)',
-                color: 'white',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 4px 12px rgba(53, 37, 205, 0.25)',
-              }}
+              className="w-full py-3.5 text-base shadow-lg shadow-primary/30 hover:shadow-primary/40 mt-2"
             >
               {loading ? (
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      width: '14px',
-                      height: '14px',
-                      border: '2px solid rgba(255,255,255,0.3)',
-                      borderTopColor: 'white',
-                      borderRadius: '50%',
-                      animation: 'spin 0.8s linear infinite',
-                    }}
-                  />
-                  Signing in...
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Authenticating...
                 </span>
               ) : (
-                'Sign In'
+                'Secure Sign In'
               )}
             </Button>
           </form>
 
           {/* Demo Credentials */}
-          <div style={{ marginTop: 'var(--spacing-2xl)', paddingTop: 'var(--spacing-2xl)', borderTop: '1px solid var(--border)' }}>
-            <p
-              style={{
-                textAlign: 'center',
-                color: 'var(--on-surface-variant)',
-                fontSize: '12px',
-                fontWeight: '600',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                marginBottom: 'var(--spacing-lg)',
-              }}
-            >
+          <div className="pt-8 border-t border-border/60">
+            <p className="text-center text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-6 px-4 before:content-[''] before:flex-1 before:h-px before:bg-border after:content-[''] after:flex-1 after:h-px after:bg-border flex items-center gap-4">
               Demo Credentials
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-              {/* Admin */}
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => fillCredentials('admin@example.com', 'Admin@123')}
-                style={{
-                  padding: 'var(--spacing-md)',
-                  backgroundColor: 'white',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-md)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  textAlign: 'left',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f0f0f0';
-                  e.currentTarget.style.borderColor = '#3525cd';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'white';
-                  e.currentTarget.style.borderColor = 'var(--border)';
-                }}
+                className="p-3 bg-surface-container/30 border border-border/80 rounded-xl cursor-pointer transition-all duration-200 text-left hover:bg-primary/5 hover:border-primary/40 hover:shadow-sm group focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
-                <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--on-surface)', marginBottom: '4px' }}>
-                  👨‍💼 Admin
-                </div>
-                <div style={{ fontSize: '11px', color: 'var(--on-surface-variant)', wordBreak: 'break-word' }}>
-                  admin@vestapay.com
+                <div className="text-xs font-bold text-on-surface mb-1 flex items-center gap-1.5">
+                  <span className="group-hover:scale-110 transition-transform">👨‍💼</span> Admin
                 </div>
               </button>
 
-              {/* Distributor */}
               <button
                 type="button"
                 onClick={() => fillCredentials('distributor@example.com', 'Distributor@123')}
-                style={{
-                  padding: 'var(--spacing-md)',
-                  backgroundColor: 'white',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-md)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  textAlign: 'left',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f0f0f0';
-                  e.currentTarget.style.borderColor = '#3525cd';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'white';
-                  e.currentTarget.style.borderColor = 'var(--border)';
-                }}
+                className="p-3 bg-surface-container/30 border border-border/80 rounded-xl cursor-pointer transition-all duration-200 text-left hover:bg-primary/5 hover:border-primary/40 hover:shadow-sm group focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
-                <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--on-surface)', marginBottom: '4px' }}>
-                  🏢 Distributor
-                </div>
-                <div style={{ fontSize: '11px', color: 'var(--on-surface-variant)', wordBreak: 'break-word' }}>
-                  distributor@ve...
+                <div className="text-xs font-bold text-on-surface mb-1 flex items-center gap-1.5">
+                  <span className="group-hover:scale-110 transition-transform">🏢</span> Dist
                 </div>
               </button>
 
-              {/* Retailer */}
               <button
                 type="button"
                 onClick={() => fillCredentials('retailer@example.com', 'Retailer@123')}
-                style={{
-                  padding: 'var(--spacing-md)',
-                  backgroundColor: 'white',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-md)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  textAlign: 'left',
-                  gridColumn: '1 / -1',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f0f0f0';
-                  e.currentTarget.style.borderColor = '#3525cd';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'white';
-                  e.currentTarget.style.borderColor = 'var(--border)';
-                }}
+                className="p-3 bg-surface-container/30 border border-border/80 rounded-xl cursor-pointer transition-all duration-200 text-left hover:bg-primary/5 hover:border-primary/40 hover:shadow-sm group col-span-2 focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
-                <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--on-surface)', marginBottom: '4px' }}>
-                  👤 Retailer
-                </div>
-                <div style={{ fontSize: '11px', color: 'var(--on-surface-variant)' }}>
-                  retailer@vestapay.com
+                <div className="text-xs font-bold text-on-surface mb-1 flex items-center gap-1.5 justify-center">
+                  <span className="group-hover:scale-110 transition-transform">👤</span> Retailer
                 </div>
               </button>
             </div>
-
-            <p
-              style={{
-                textAlign: 'center',
-                fontSize: '12px',
-                color: 'var(--on-surface-variant)',
-                marginTop: 'var(--spacing-lg)',
-                marginBottom: 0,
-              }}
-            >
-              Click any credential button to fill the form
+            <p className="text-center text-xs text-on-surface-variant/70 mt-4 font-medium">
+              Click to autofill
             </p>
           </div>
         </div>
       </div>
-
-      {/* CSS Animation */}
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 };

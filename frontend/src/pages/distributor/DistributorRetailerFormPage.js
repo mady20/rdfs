@@ -96,29 +96,23 @@ export const DistributorRetailerFormPage = () => {
 
   return (
     <PageLayout title={isEdit ? 'Edit Retailer' : 'Create Retailer'}>
-      <Card>
+      <Card className="max-w-3xl mx-auto shadow-md">
         {mainError && (
-          <div
-            style={{
-              backgroundColor: 'rgba(186, 26, 26, 0.1)',
-              color: 'var(--error)',
-              padding: 'var(--spacing-md)',
-              borderRadius: 'var(--radius-md)',
-              marginBottom: 'var(--spacing-lg)',
-            }}
-          >
-            {mainError}
+          <div className="bg-error/10 text-error px-4 py-3 rounded-xl mb-6 flex items-center gap-3 border border-error/20 animate-fade-in">
+            <span className="text-xl">⚠️</span>
+            <span className="text-sm font-semibold">{mainError}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-row">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
             <Input
               label="Name"
               name="name"
               value={formData.name}
               onChange={handleChange}
               error={errors.name}
+              placeholder="Retailer Name"
               required
             />
             <Input
@@ -129,6 +123,7 @@ export const DistributorRetailerFormPage = () => {
               onChange={handleChange}
               disabled={isEdit}
               error={errors.email}
+              placeholder="email@example.com"
               required={!isEdit}
             />
           </div>
@@ -141,17 +136,19 @@ export const DistributorRetailerFormPage = () => {
               value={formData.password}
               onChange={handleChange}
               error={errors.password}
+              placeholder="••••••••"
               required
             />
           )}
 
-          <div className="form-row">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
             <Input
               label="Phone"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
               error={errors.phone}
+              placeholder="+1234567890"
               required
             />
             <Input
@@ -161,6 +158,7 @@ export const DistributorRetailerFormPage = () => {
               value={formData.commissionPercent}
               onChange={handleChange}
               error={errors.commissionPercent}
+              placeholder="0.00"
             />
           </div>
 
@@ -169,30 +167,36 @@ export const DistributorRetailerFormPage = () => {
             name="address"
             value={formData.address}
             onChange={handleChange}
+            placeholder="Full physical address"
           />
 
           {isEdit && (
-            <div className="form-group">
-              <label>
-                <input
-                  type="checkbox"
-                  name="isActive"
-                  checked={formData.isActive}
-                  onChange={handleChange}
-                />
-                <span style={{ marginLeft: 'var(--spacing-md)' }}>Active</span>
+            <div className="py-3 px-1 my-2 border-t border-b border-border bg-surface-bright rounded-lg flex items-center pl-4">
+              <label className="inline-flex items-center cursor-pointer">
+                <div className="relative flex items-center">
+                  <input
+                    className="peer sr-only"
+                    type="checkbox"
+                    name="isActive"
+                    checked={formData.isActive}
+                    onChange={handleChange}
+                  />
+                  <div className="w-11 h-6 bg-surface-dim rounded-full peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary transition-colors duration-300"></div>
+                </div>
+                <span className="ml-3 text-sm font-semibold text-on-surface">Active Status</span>
               </label>
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-lg)' }}>
-            <Button variant="primary" type="submit" disabled={submitting}>
-              {submitting ? 'Saving...' : 'Save'}
+          <div className="flex gap-4 mt-8 pt-4 border-t border-border/50">
+            <Button variant="primary" type="submit" disabled={submitting} className="flex-1 py-3 text-base">
+              {submitting ? 'Saving...' : 'Save Changes'}
             </Button>
             <Button
               variant="secondary"
               type="button"
               onClick={() => navigate('/distributor/retailers')}
+              className="flex-1 py-3 text-base"
             >
               Cancel
             </Button>

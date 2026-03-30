@@ -56,43 +56,54 @@ export const DistributorTransactionsPage = () => {
     { 
       key: 'status', 
       label: 'Status',
-      render: (row) => <span className={`table-status status-${row.status}`}>{row.status}</span>
+      render: (row) => {
+        const s = (row.status || '').toLowerCase();
+        const cls = s === 'success' ? 'bg-green-100 text-green-800 border-green-200' : s === 'pending' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 'bg-red-100 text-red-800 border-red-200';
+        return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide border ${cls}`}>{row.status}</span>;
+      }
     },
     { key: 'createdAt', label: 'Date', render: (row) => formatDate(row.createdAt) },
   ];
 
   return (
     <PageLayout title="Transactions">
-      {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--spacing-lg)' }}>{error}</div>}
+      {error && (
+        <div className="bg-error/10 text-error px-4 py-3 rounded-xl mb-6 flex items-center gap-3 border border-error/20 animate-fade-in">
+          <span className="text-xl">⚠️</span>
+          <span className="text-sm font-semibold">{error}</span>
+        </div>
+      )}
 
       <Card>
-        <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)' }}>
-          <Select
-            label="Filter by Type"
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            options={[
-              { label: 'All Types', value: '' },
-              ...TRANSACTION_TYPES.map((t) => ({ label: t, value: t })),
-            ]}
-            style={{ maxWidth: '200px' }}
-          />
-          <Select
-            label="Filter by Status"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            options={[
-              { label: 'All Status', value: '' },
-              ...TRANSACTION_STATUS.map((s) => ({ label: s, value: s })),
-            ]}
-            style={{ maxWidth: '200px' }}
-          />
+        <div className="flex flex-col sm:flex-row gap-4 mb-6 bg-surface-bright p-4 rounded-xl border border-border items-end">
+          <div className="flex-1 w-full max-w-[200px]">
+            <Select
+              label="Filter by Type"
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              options={[
+                { label: 'All Types', value: '' },
+                ...TRANSACTION_TYPES.map((t) => ({ label: t, value: t })),
+              ]}
+            />
+          </div>
+          <div className="flex-1 w-full max-w-[200px]">
+            <Select
+              label="Filter by Status"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              options={[
+                { label: 'All Status', value: '' },
+                ...TRANSACTION_STATUS.map((s) => ({ label: s, value: s })),
+              ]}
+            />
+          </div>
         </div>
 
         <Table 
           columns={columns} 
           data={filteredData}
-          emptyMessage="No transactions found"
+          emptyMessage="No transactions found matching the selected filters"
         />
       </Card>
     </PageLayout>

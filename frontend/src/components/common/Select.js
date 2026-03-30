@@ -11,11 +11,11 @@ export const Select = ({
   required = false,
 }) => {
   return (
-    <div className="form-group">
+    <div className="flex flex-col gap-1.5 w-full mb-4">
       {label && (
-        <label htmlFor={name}>
+        <label htmlFor={name} className="text-sm font-semibold text-on-surface">
           {label}
-          {required && <span style={{ color: 'var(--error)' }}>*</span>}
+          {required && <span className="text-error ml-1">*</span>}
         </label>
       )}
       <select
@@ -24,7 +24,11 @@ export const Select = ({
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className={`w-full px-3 py-2 border rounded-md bg-surface-bright text-on-surface focus:outline-none focus:border-primary ${error ? 'border-error' : 'border-border'}`}
+        className={`w-full px-4 py-2.5 transition-all duration-200 border rounded-lg bg-surface text-on-surface focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+          error
+            ? 'border-error focus:ring-error focus:border-error'
+            : 'border-border focus:ring-primary focus:border-primary hover:border-on-surface-variant/30'
+        }`}
       >
         <option value="">-- Select Option --</option>
         {options.map((opt) => (
@@ -33,7 +37,7 @@ export const Select = ({
           </option>
         ))}
       </select>
-      {error && <span className="form-error-message">{error}</span>}
+      {error && <span className="text-sm text-error font-medium animate-fade-in">{error}</span>}
     </div>
   );
 };

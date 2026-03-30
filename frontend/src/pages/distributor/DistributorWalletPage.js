@@ -67,84 +67,95 @@ export const DistributorWalletPage = () => {
 
   return (
     <PageLayout title="My Wallet">
-      {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--spacing-lg)' }}>{error}</div>}
-
-      <Card title="Wallet Balance">
-        <div style={{ fontSize: 'var(--font-size-2xl)', color: 'var(--primary)', fontWeight: 'bold', marginBottom: 'var(--spacing-lg)' }}>
-          {formatCurrency(wallet?.balance || 0)}
+      {error && (
+        <div className="bg-error/10 text-error px-4 py-3 rounded-xl mb-6 flex items-center gap-3 border border-error/20 animate-fade-in">
+          <span className="text-xl">⚠️</span>
+          <span className="text-sm font-semibold">{error}</span>
         </div>
-      </Card>
+      )}
 
-      <Card title="Transfer to Retailer">
-        <form onSubmit={handleTransfer}>
-          <select
-            name="transferTo"
-            value={transferTo}
-            onChange={(e) => setTransferTo(e.target.value)}
-            style={{
-              width: '100%',
-              padding: 'var(--spacing-md)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border)',
-              marginBottom: 'var(--spacing-md)',
-            }}
-            required
-          >
-            <option value="">-- Select Retailer --</option>
-            {retailers.map((r) => (
-              <option key={r._id} value={r._id}>
-                {r.name} ({r.email})
-              </option>
-            ))}
-          </select>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <Card title="Wallet Balance" className="flex flex-col justify-center">
+          <div className="text-4xl font-headline font-bold text-primary mb-2">
+            {formatCurrency(wallet?.balance || 0)}
+          </div>
+          <p className="text-on-surface-variant font-medium">Available Balance</p>
+        </Card>
 
-          <Input
-            label="Amount"
-            type="number"
-            value={transferAmount}
-            onChange={(e) => setTransferAmount(e.target.value)}
-            required
-          />
+        <Card title="Transfer to Retailer">
+          <form onSubmit={handleTransfer} className="flex flex-col gap-4">
+            <div className="flex flex-col">
+              <label className="text-sm font-semibold text-on-surface mb-1.5 uppercase tracking-wide">
+                Select Retailer
+              </label>
+              <select
+                name="transferTo"
+                value={transferTo}
+                onChange={(e) => setTransferTo(e.target.value)}
+                className="w-full px-4 py-2.5 bg-surface border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-on-surface hover:border-on-surface-variant/30"
+                required
+              >
+                <option value="" disabled>-- Select Retailer --</option>
+                {retailers.map((r) => (
+                  <option key={r._id} value={r._id}>
+                    {r.name} ({r.email})
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <Button 
-            variant="primary" 
-            type="submit"
-            disabled={transferring}
-          >
-            {transferring ? 'Transferring...' : 'Transfer'}
-          </Button>
-        </form>
-      </Card>
+            <Input
+              label="Amount"
+              type="number"
+              value={transferAmount}
+              onChange={(e) => setTransferAmount(e.target.value)}
+              placeholder="0.00"
+              required
+            />
+
+            <Button 
+              variant="primary" 
+              type="submit"
+              disabled={transferring}
+              className="py-3 text-base mt-2"
+            >
+              {transferring ? 'Transferring...' : 'Send Funds'}
+            </Button>
+          </form>
+        </Card>
+      </div>
 
       <Card title="Ledger History">
-        <table className="table" style={{ width: '100%', marginTop: 'var(--spacing-md)' }}>
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Before</th>
-              <th>After</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ledger.length > 0 ? (
-              ledger.slice(0, 10).map((entry) => (
-                <tr key={entry._id}>
-                  <td>{entry.type}</td>
-                  <td>{formatCurrency(entry.amount)}</td>
-                  <td>{formatCurrency(entry.balanceBefore)}</td>
-                  <td>{formatCurrency(entry.balanceAfter)}</td>
-                  <td>{entry.description}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" style={{ textAlign: 'center' }}>No entries</td>
+        <div className="overflow-x-auto mt-4">
+          <table className="w-full text-left border-collapse min-w-[600px]">
+            <thead>
+              <tr className="border-b border-border/80 text-xs uppercase tracking-wider text-on-surface-variant/70 font-bold bg-surface-bright/50">
+                <th className="px-4 py-3 rounded-tl-xl">Type</th>
+                <th className="px-4 py-3 text-right">Amount</th>
+                <th className="px-4 py-3 text-right">Before</th>
+                <th className="px-4 py-3 text-right">After</th>
+                <th className="px-4 py-3 rounded-tr-xl">Description</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-border/40 font-medium text-sm">
+              {ledger.length > 0 ? (
+                ledger.slice(0, 10).map((entry) => (
+                  <tr key={entry._id} className="hover:bg-primary/5 transition-colors duration-200">
+                    <td className="px-4 py-3 text-on-surface capitalize">{entry.type}</td>
+                    <td className="px-4 py-3 text-right font-semibold text-primary">{formatCurrency(entry.amount)}</td>
+                    <td className="px-4 py-3 text-right text-on-surface-variant">{formatCurrency(entry.balanceBefore)}</td>
+                    <td className="px-4 py-3 text-right text-on-surface-variant">{formatCurrency(entry.balanceAfter)}</td>
+                    <td className="px-4 py-3 text-on-surface-variant/90">{entry.description}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="px-4 py-8 text-center text-on-surface-variant font-medium">No transaction entries found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </Card>
     </PageLayout>
   );

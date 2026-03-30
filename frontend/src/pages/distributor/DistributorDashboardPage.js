@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PageLayout from '../../components/layout/PageLayout';
 import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
+import Button from '../../components/common/Button';
 import Loader from '../../components/common/Loader';
 import axiosInstance from '../../api/axios';
 import { formatDate, formatCurrency, apiErrorMessage } from '../../utils/helpers';
@@ -48,27 +49,27 @@ export const DistributorDashboardPage = () => {
     <PageLayout title="Distributor Dashboard">
       {error && <div className="text-red-600 mb-6">{error}</div>}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
         <div className="lg:col-span-2">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Card>
-              <div className="flex items-center gap-4">
-                <div className="text-2xl">💳</div>
+              <div className="flex items-center gap-5">
+                <div className="text-3xl p-3 bg-primary/10 rounded-2xl text-primary">💳</div>
                 <div>
-                  <div className="text-sm text-gray-500">My Wallet</div>
-                  <div className="text-2xl font-semibold">{formatCurrency(data?.ownWalletBalance || 0)}</div>
-                  <div className="text-sm text-gray-400">Available balance</div>
+                  <div className="text-sm font-semibold text-on-surface-variant uppercase tracking-wider mb-1">My Wallet</div>
+                  <div className="text-3xl font-bold text-on-surface">{formatCurrency(data?.ownWalletBalance || 0)}</div>
+                  <div className="text-xs text-on-surface-variant/70 mt-1 font-medium">Available balance</div>
                 </div>
               </div>
             </Card>
 
             <Card>
-              <div className="flex items-center gap-4">
-                <div className="text-2xl">👥</div>
+              <div className="flex items-center gap-5">
+                <div className="text-3xl p-3 bg-primary/10 rounded-2xl text-primary">👥</div>
                 <div>
-                  <div className="text-sm text-gray-500">Retailers</div>
-                  <div className="text-2xl font-semibold">{data?.retailerCount || 0}</div>
-                  <div className="text-sm text-gray-400">Assigned retailers</div>
+                  <div className="text-sm font-semibold text-on-surface-variant uppercase tracking-wider mb-1">Retailers</div>
+                  <div className="text-3xl font-bold text-on-surface">{data?.retailerCount || 0}</div>
+                  <div className="text-xs text-on-surface-variant/70 mt-1 font-medium">Assigned retailers</div>
                 </div>
               </div>
             </Card>
@@ -85,23 +86,34 @@ export const DistributorDashboardPage = () => {
           </div>
         </div>
 
-        <aside className="lg:col-span-1 space-y-4">
+        <aside className="lg:col-span-1 space-y-6">
           <Card title="Quick Actions">
             <div className="flex flex-col gap-3">
-              <button className="table-action-btn table-action-btn-primary">Create Retailer</button>
-              <button className="table-action-btn table-action-btn-secondary">Transfer Funds</button>
+              <Button variant="primary" className="w-full justify-start py-3">
+                <span className="mr-3 text-lg">➕</span> Create Retailer
+              </Button>
+              <Button variant="secondary" className="w-full justify-start py-3">
+                <span className="mr-3 text-lg">🔄</span> Transfer Funds
+              </Button>
             </div>
           </Card>
 
           <Card title="Recent Activity">
-            <div className="flex flex-col gap-3 text-sm text-gray-600">
-              {(data?.activity || []).slice(0,6).map((a) => (
-                <div key={a._id || a.id}>
-                  <div className="font-medium text-gray-800">{a.title || a.message}</div>
-                  <div className="text-xs text-gray-400">{formatDate(a.createdAt)}</div>
+            <div className="flex flex-col gap-4">
+              {(data?.activity || []).slice(0,6).map((a, i) => (
+                <div key={a._id || a.id || i} className="flex gap-4 items-start pb-4 border-b border-border/50 last:border-0 last:pb-0">
+                  <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
+                  <div>
+                    <div className="font-semibold text-sm text-on-surface mb-0.5">{a.title || a.message}</div>
+                    <div className="text-xs font-medium text-on-surface-variant/70">{formatDate(a.createdAt)}</div>
+                  </div>
                 </div>
               ))}
-              {!data?.activity?.length && <div className="text-gray-500">No recent activity</div>}
+              {!data?.activity?.length && (
+                <div className="text-sm font-medium text-on-surface-variant text-center py-4 bg-surface-bright rounded-xl border border-border">
+                  No recent activity
+                </div>
+              )}
             </div>
           </Card>
         </aside>

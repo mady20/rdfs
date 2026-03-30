@@ -42,11 +42,31 @@ module.exports = {
         body: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
       },
       boxShadow: {
-        sm: '0 1px 2px rgba(0,0,0,0.05)',
-        md: '0 4px 6px rgba(0,0,0,0.1)',
-        lg: '0 10px 15px rgba(0,0,0,0.1)'
+        sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+        xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+        'soft': '0 4px 20px rgba(0, 0, 0, 0.05)',
+        'glow': '0 0 15px rgba(53, 37, 205, 0.3)',
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.3s ease-out',
+        'slide-up': 'slideUp 0.4s ease-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        }
       }
     }
   },
-  plugins: []
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms'),
+  ],
 };

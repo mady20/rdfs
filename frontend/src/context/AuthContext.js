@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
-import axiosInstance from '../api/axios';
+import { useNavigate } from 'react-router-dom';
+import axiosInstance, { setUnauthorizedHandler } from '../api/axios';
 
 export const AuthContext = createContext();
 
@@ -8,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -48,7 +50,13 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUser(null);
     setIsAuthenticated(false);
-  }, []);
+    // navigate to login so UI resets
+    try {
+      navigate('/login');
+    } catch (e) {
+      // no-op if navigate isn't available
+    }
+  }, [navigate]);
 
   const loadCurrentUser = useCallback(async () => {
     if (!token) return;
@@ -65,6 +73,12 @@ export const AuthProvider = ({ children }) => {
       logout();
     }
   }, [token, logout]);
+
+  // Register axios 401 handler to perform app logout
+  useEffect(() => {
+    setUnauthorizedHandler(logout);
+    return () => setUnauthorizedHandler(null);
+  }, [logout]);
 
   const value = {
     user,

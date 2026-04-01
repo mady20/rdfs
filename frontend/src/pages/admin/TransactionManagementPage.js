@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PageLayout from '../../components/layout/PageLayout';
 import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
@@ -8,6 +8,8 @@ import Modal from '../../components/common/Modal';
 import Loader from '../../components/common/Loader';
 import axiosInstance from '../../api/axios';
 import { formatDate, formatCurrency, apiErrorMessage } from '../../utils/helpers';
+import { useToast } from '../../context/ToastContext';
+import { useConfirm } from '../../context/ConfirmContext';
 import { TRANSACTION_TYPES, TRANSACTION_STATUS } from '../../utils/constants';
 
 export const TransactionManagementPage = () => {
@@ -36,8 +38,10 @@ export const TransactionManagementPage = () => {
     };
     fetchTransactions();
   }, []);
+  const { showToast } = useToast();
+  const showConfirm = useConfirm();
 
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = transactions;
 
     if (typeFilter) {
@@ -49,21 +53,22 @@ export const TransactionManagementPage = () => {
     }
 
     setFilteredData(filtered);
-  };
+  }, [transactions, typeFilter, statusFilter]);
 
   useEffect(() => {
     applyFilters();
-  }, [typeFilter, statusFilter]);
+  }, [applyFilters]);
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this transaction?')) {
-      try {
-        await axiosInstance.delete(`/transactions/${id}`);
-        setTransactions(transactions.filter((t) => t._id !== id));
-        applyFilters();
-      } catch (err) {
-        alert(apiErrorMessage(err));
-      }
+    const confirm = await showConfirm('Are you sure you want to delete this transaction?');
+    if (!confirm) return;
+
+    try {
+      await axiosInstance.delete(`/transactions/${id}`);
+      setTransactions(transactions.filter((t) => t._id !== id));
+      applyFilters();
+    } catch (err) {
+      showToast(apiErrorMessage(err), { type: 'error' });
     }
   };
 
@@ -75,7 +80,7 @@ export const TransactionManagementPage = () => {
 
   const handleUpdateStatus = async () => {
     if (newStatus === selectedTransaction.status) {
-      alert('Status is the same');
+      showToast('Status is the same', { type: 'info' });
       return;
     }
 
@@ -93,7 +98,7 @@ export const TransactionManagementPage = () => {
       setShowModal(false);
       setSelectedTransaction(null);
     } catch (err) {
-      alert(apiErrorMessage(err));
+      showToast(apiErrorMessage(err), { type: 'error' });
     } finally {
       setUpdating(false);
     }
@@ -117,16 +122,20 @@ export const TransactionManagementPage = () => {
     { key: 'customerName', label: 'Customer' },
     { key: 'customerMobile', label: 'Mobile' },
     { key: 'amount', label: 'Amount', render: (row) => formatCurrency(row.amount) },
-    { 
-      key: 'status', 
+    {
+      key: 'status',
       label: 'Status',
-      render: (row) => <span className={`table-status status-${row.status}`}>{row.status}</span>
+      render: (row) => {
+        const s = (row.status || '').toLowerCase();
+        const cls = s === 'success' ? 'bg-green-100 text-green-800' : s === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800';
+        return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>{row.status}</span>;
+      }
     },
     { key: 'createdAt', label: 'Date', render: (row) => formatDate(row.createdAt) },
   ];
 
   const renderActions = (row) => (
-    <div className="table-actions">
+    <div className="flex gap-2">
       <Button variant="secondary" onClick={() => handleOpenStatusModal(row)}>
         Change Status
       </Button>
@@ -138,30 +147,36 @@ export const TransactionManagementPage = () => {
 
   return (
     <PageLayout title="Transaction Management">
-      {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--spacing-lg)' }}>{error}</div>}
+      {error && <div className="text-red-600 mb-4">{error}</div>}
 
       <Card>
-        <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)' }}>
-          <Select
-            label="Filter by Type"
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            options={[
-              { label: 'All Types', value: '' },
-              ...TRANSACTION_TYPES.map((t) => ({ label: t, value: t })),
-            ]}
-            style={{ maxWidth: '200px' }}
-          />
-          <Select
-            label="Filter by Status"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            options={[
-              { label: 'All Status', value: '' },
-              ...TRANSACTION_STATUS.map((s) => ({ label: s, value: s })),
-            ]}
-            style={{ maxWidth: '200px' }}
-          />
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-4">
+          <div className="flex gap-3 w-full sm:w-auto">
+            <div className="w-full sm:w-48">
+              <Select
+                label="Filter by Type"
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                options={[
+                  { label: 'All Types', value: '' },
+                  ...TRANSACTION_TYPES.map((t) => ({ label: t, value: t })),
+                ]}
+              />
+            </div>
+            <div className="w-full sm:w-48">
+              <Select
+                label="Filter by Status"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                options={[
+                  { label: 'All Status', value: '' },
+                  ...TRANSACTION_STATUS.map((s) => ({ label: s, value: s })),
+                ]}
+              />
+            </div>
+          </div>
+
+          {/* header actions (none) */}
         </div>
 
         <Table 
@@ -186,7 +201,7 @@ export const TransactionManagementPage = () => {
           onChange={(e) => setNewStatus(e.target.value)}
           options={TRANSACTION_STATUS.map((s) => ({ label: s, value: s }))}
         />
-        <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-lg)' }}>
+        <div className="flex gap-3 mt-4">
           <Button 
             variant="primary" 
             onClick={handleUpdateStatus}

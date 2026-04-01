@@ -10,6 +10,8 @@ import Select from '../../components/common/Select';
 import Loader from '../../components/common/Loader';
 import axiosInstance from '../../api/axios';
 import { formatDate, apiErrorMessage } from '../../utils/helpers';
+import { useToast } from '../../context/ToastContext';
+import { useConfirm } from '../../context/ConfirmContext';
 
 export const RetailerListPage = () => {
   const navigate = useNavigate();
@@ -41,6 +43,8 @@ export const RetailerListPage = () => {
     };
     fetchData();
   }, []);
+  const { showToast } = useToast();
+  const showConfirm = useConfirm();
 
   const handleSearch = (value) => {
     setSearch(value);
@@ -53,14 +57,15 @@ export const RetailerListPage = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this retailer?')) {
-      try {
-        await axiosInstance.delete(`/users/${id}`);
-        setRetailers(retailers.filter((r) => r._id !== id));
-        setFilteredData(filteredData.filter((r) => r._id !== id));
-      } catch (err) {
-        alert(apiErrorMessage(err));
-      }
+    const confirm = await showConfirm('Are you sure you want to delete this retailer?');
+    if (!confirm) return;
+
+    try {
+      await axiosInstance.delete(`/users/${id}`);
+      setRetailers(retailers.filter((r) => r._id !== id));
+      setFilteredData(filteredData.filter((r) => r._id !== id));
+    } catch (err) {
+      showToast(apiErrorMessage(err), { type: 'error' });
     }
   };
 
@@ -77,13 +82,13 @@ export const RetailerListPage = () => {
         r.phone.includes(search)
       ));
     } catch (err) {
-      alert(apiErrorMessage(err));
+      showToast(apiErrorMessage(err), { type: 'error' });
     }
   };
 
   const handleAssignDistributor = async () => {
     if (!selectedDistributor) {
-      alert('Please select a distributor');
+      showToast('Please select a distributor', { type: 'error' });
       return;
     }
     try {
@@ -105,7 +110,7 @@ export const RetailerListPage = () => {
       setSelectedRetailerId(null);
       setSelectedDistributor('');
     } catch (err) {
-      alert(apiErrorMessage(err));
+      showToast(apiErrorMessage(err), { type: 'error' });
     }
   };
 
@@ -121,10 +126,13 @@ export const RetailerListPage = () => {
       render: (row) => row.parentDistributor?.name || '-'
     },
     { key: 'commissionPercent', label: 'Commission %' },
-    { 
-      key: 'isActive', 
+    {
+      key: 'isActive',
       label: 'Status',
-      render: (row) => <span className={`table-status status-${row.isActive ? 'active' : 'inactive'}`}>{row.isActive ? 'Active' : 'Inactive'}</span>
+      render: (row) => {
+        const cls = row.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700';
+        return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>{row.isActive ? 'Active' : 'Inactive'}</span>;
+      }
     },
     { key: 'address', label: 'Address' },
     { 
@@ -135,7 +143,7 @@ export const RetailerListPage = () => {
   ];
 
   const renderActions = (row) => (
-    <div className="table-actions">
+    <div className="flex gap-2">
       <Button variant="secondary" onClick={() => navigate(`/admin/users/${row._id}/edit`)}>
         Edit
       </Button>
@@ -162,19 +170,22 @@ export const RetailerListPage = () => {
 
   return (
     <PageLayout title="Retailers">
-      {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--spacing-lg)' }}>{error}</div>}
+      {error && <div className="text-red-600 mb-4">{error}</div>}
 
       <Card>
-        <div className="section-actions">
-          <Input
-            placeholder="Search by name, email, or phone..."
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            style={{ maxWidth: '300px' }}
-          />
-          <Button variant="primary" onClick={() => navigate('/admin/users/create?type=retailer')}>
-            + New Retailer
-          </Button>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div className="w-full sm:w-72">
+            <Input
+              placeholder="Search by name, email, or phone..."
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </div>
+          <div>
+            <Button variant="primary" onClick={() => navigate('/admin/users/create?type=retailer')}>
+              + New Retailer
+            </Button>
+          </div>
         </div>
 
         <Table 
@@ -201,7 +212,7 @@ export const RetailerListPage = () => {
           options={distributors.map((d) => ({ label: d.name, value: d._id }))}
           required
         />
-        <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-lg)' }}>
+        <div className="flex gap-3 mt-4">
           <Button variant="primary" onClick={handleAssignDistributor}>
             Assign
           </Button>

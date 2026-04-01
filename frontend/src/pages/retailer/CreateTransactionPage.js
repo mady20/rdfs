@@ -6,6 +6,7 @@ import Select from '../../components/common/Select';
 import Button from '../../components/common/Button';
 import axiosInstance from '../../api/axios';
 import { apiErrorMessage } from '../../utils/helpers';
+import { useToast } from '../../context/ToastContext';
 import { TRANSACTION_TYPES } from '../../utils/constants';
 
 export const CreateTransactionPage = () => {
@@ -19,6 +20,7 @@ export const CreateTransactionPage = () => {
   });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const { showToast } = useToast();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -42,7 +44,7 @@ export const CreateTransactionPage = () => {
         notes: formData.notes,
         deductFromWallet: formData.deductFromWallet,
       });
-      alert('Transaction created successfully');
+      showToast('Transaction created successfully', { type: 'success' });
       setFormData({
         type: '',
         customerName: '',
@@ -61,21 +63,9 @@ export const CreateTransactionPage = () => {
   return (
     <PageLayout title="Create Transaction">
       <Card>
-        {error && (
-          <div
-            style={{
-              backgroundColor: 'rgba(186, 26, 26, 0.1)',
-              color: 'var(--error)',
-              padding: 'var(--spacing-md)',
-              borderRadius: 'var(--radius-md)',
-              marginBottom: 'var(--spacing-lg)',
-            }}
-          >
-            {error}
-          </div>
-        )}
+        {error && <div className="bg-red-50 text-red-700 p-3 rounded mb-4">{error}</div>}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <Select
             label="Transaction Type"
             name="type"
@@ -85,7 +75,7 @@ export const CreateTransactionPage = () => {
             required
           />
 
-          <div className="form-row">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label="Customer Name"
               name="customerName"
@@ -118,21 +108,24 @@ export const CreateTransactionPage = () => {
             onChange={handleChange}
           />
 
-          <div className="form-group">
-            <label>
+          <div>
+            <label className="inline-flex items-center">
               <input
                 type="checkbox"
                 name="deductFromWallet"
                 checked={formData.deductFromWallet}
                 onChange={handleChange}
+                className="h-4 w-4 text-primary rounded"
               />
-              <span style={{ marginLeft: 'var(--spacing-md)' }}>Deduct from My Wallet</span>
+              <span className="ml-3">Deduct from My Wallet</span>
             </label>
           </div>
 
-          <Button variant="primary" type="submit" disabled={submitting}>
-            {submitting ? 'Creating...' : 'Create Transaction'}
-          </Button>
+          <div>
+            <Button variant="primary" type="submit" disabled={submitting}>
+              {submitting ? 'Creating...' : 'Create Transaction'}
+            </Button>
+          </div>
         </form>
       </Card>
     </PageLayout>

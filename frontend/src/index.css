@@ -1,44 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import './assets/styles/global.css';
-@import './assets/styles/dashboard.css';
-@import './assets/styles/forms.css';
-@import './assets/styles/tables.css';
-@import './assets/styles/layout.css';
+/* Legacy CSS files are archived under assets/styles/legacy. Tailwind theme and
+   component utilities are the source of truth going forward. */
 
-/* Base resets and mapping to theme */
 @layer base {
-  :root {
-    --bg-surface: #f7f9fb;
-  }
-  html, body, #root {
-    height: 100%;
-  }
-  body {
-    @apply bg-surface text-on-surface font-body;
-  }
-}
-
-/* Example utility for primary button (used by legacy components) */
-@layer components {
-  .btn-primary {
-    @apply bg-primary text-white rounded-md px-4 py-2 font-semibold shadow-sm;
-  }
-  .card-base {
-    @apply bg-white border border-border rounded-lg p-6 shadow-sm;
-  }
-  .table-action-btn {
-    @apply px-3 py-1 rounded text-sm;
-  }
-  .table-action-btn-primary {
-    @apply bg-primary text-white;
-  }
-  .table-action-btn-secondary {
-    @apply bg-surface-container text-on-surface border;
-  }
-  .table-action-btn-danger {
-    @apply bg-error text-white;
-  }
+  html, body, #root { height: 100%; }
+  body { @apply bg-surface text-on-surface font-body; }
 }

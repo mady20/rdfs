@@ -8,6 +8,7 @@ import Input from '../../components/common/Input';
 import Loader from '../../components/common/Loader';
 import axiosInstance from '../../api/axios';
 import { formatDate, apiErrorMessage } from '../../utils/helpers';
+import { useToast } from '../../context/ToastContext';
 
 export const DistributorRetailersPage = () => {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ export const DistributorRetailersPage = () => {
     };
     fetchRetailers();
   }, []);
+  const { showToast } = useToast();
 
   const handleSearch = (value) => {
     setSearch(value);
@@ -55,7 +57,7 @@ export const DistributorRetailersPage = () => {
         r.phone.includes(search)
       ));
     } catch (err) {
-      alert(apiErrorMessage(err));
+      showToast(apiErrorMessage(err), { type: 'error' });
     }
   };
 
@@ -66,21 +68,24 @@ export const DistributorRetailersPage = () => {
     { key: 'email', label: 'Email' },
     { key: 'phone', label: 'Phone' },
     { key: 'commissionPercent', label: 'Commission %' },
-    { 
-      key: 'isActive', 
+    {
+      key: 'isActive',
       label: 'Status',
-      render: (row) => <span className={`table-status status-${row.isActive ? 'active' : 'inactive'}`}>{row.isActive ? 'Active' : 'Inactive'}</span>
+      render: (row) => {
+        const cls = row.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700';
+        return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>{row.isActive ? 'Active' : 'Inactive'}</span>;
+      }
     },
     { key: 'address', label: 'Address' },
-    { 
-      key: 'createdAt', 
+    {
+      key: 'createdAt',
       label: 'Created',
       render: (row) => formatDate(row.createdAt)
     },
   ];
 
   const renderActions = (row) => (
-    <div className="table-actions">
+    <div className="flex items-center gap-3">
       <Button variant="secondary" onClick={() => navigate(`/distributor/retailers/${row._id}/edit`)}>
         Edit
       </Button>
@@ -95,19 +100,22 @@ export const DistributorRetailersPage = () => {
 
   return (
     <PageLayout title="My Retailers">
-      {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--spacing-lg)' }}>{error}</div>}
+      {error && <div className="text-red-600 mb-4">{error}</div>}
 
       <Card>
-        <div className="section-actions">
-          <Input
-            placeholder="Search by name, email, or phone..."
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            style={{ maxWidth: '300px' }}
-          />
-          <Button variant="primary" onClick={() => navigate('/distributor/retailers/create')}>
-            + New Retailer
-          </Button>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div className="w-full sm:w-72">
+            <Input
+              placeholder="Search by name, email, or phone..."
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </div>
+          <div>
+            <Button variant="primary" onClick={() => navigate('/distributor/retailers/create')}>
+              + New Retailer
+            </Button>
+          </div>
         </div>
 
         <Table 

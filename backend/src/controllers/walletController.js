@@ -35,7 +35,7 @@ const getMyWallet = async (req, res) => {
 const getMyLedger = async (req, res) => {
   try {
     const ledger = await WalletLedger.find({ user: req.user._id })
-      .populated('relatedUser', 'name email')
+      .populate('relatedUser', 'name email')
       .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -204,7 +204,9 @@ const adminAdjustWallet = async (req, res) => {
 // Transfer wallet from distributor to retailer
 const transferWallet = async (req, res) => {
   try {
-    const { retailerId, amount, description } = req.body;
+    // Accept both frontend and backend payload shapes for compatibility
+    const retailerId = req.body.retailerId || req.body.toUser || req.body.to || req.body.toUserId;
+    const { amount, description } = req.body;
 
     const errors = validateWalletTransfer({ retailerId, amount });
     if (Object.keys(errors).length > 0) {

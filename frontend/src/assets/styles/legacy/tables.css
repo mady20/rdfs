@@ -32,7 +32,7 @@ td {
   color: var(--on-surface);
 }
 
-tbody tr {
+,tbody tr {
   transition: background-color 0.2s;
 }
 
@@ -48,43 +48,6 @@ tbody tr:last-child td {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-}
-
-.table-action-btn {
-  padding: var(--spacing-xs) var(--spacing-md);
-  font-size: var(--font-size-sm);
-  border: none;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.table-action-btn-primary {
-  background-color: var(--primary);
-  color: white;
-}
-
-.table-action-btn-primary:hover {
-  background-color: var(--primary-dark);
-}
-
-.table-action-btn-secondary {
-  background-color: var(--surface-container);
-  color: var(--on-surface);
-  border: 1px solid var(--border);
-}
-
-.table-action-btn-secondary:hover {
-  background-color: var(--surface-container-high);
-}
-
-.table-action-btn-danger {
-  background-color: var(--error);
-  color: white;
-}
-
-.table-action-btn-danger:hover {
-  background-color: #a01818;
 }
 
 .table-status {

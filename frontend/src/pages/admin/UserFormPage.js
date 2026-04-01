@@ -35,8 +35,8 @@ export const UserFormPage = () => {
         try {
           const response = await axiosInstance.get(`/users/${id}`);
           const user = response.data.data;
-          setFormData({
-            ...formData,
+          setFormData((prev) => ({
+            ...prev,
             name: user.name,
             email: user.email,
             phone: user.phone,
@@ -44,7 +44,7 @@ export const UserFormPage = () => {
             commissionPercent: user.commissionPercent || 0,
             parentDistributor: user.parentDistributor?._id || '',
             isActive: user.isActive,
-          });
+          }));
           setUserType(user.role);
         } catch (err) {
           setMainError(apiErrorMessage(err));
@@ -64,7 +64,7 @@ export const UserFormPage = () => {
       }
     };
     fetchDistributors();
-  }, [id]);
+  }, [id, isEdit]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -206,7 +206,7 @@ export const UserFormPage = () => {
             <div className="py-2">
               <label className="inline-flex items-center">
                 <input
-                  className="form-checkbox h-4 w-4 text-primary rounded"
+                  className="h-4 w-4 text-primary rounded"
                   type="checkbox"
                   name="isActive"
                   checked={formData.isActive}

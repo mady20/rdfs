@@ -56,45 +56,54 @@ export const RetailerTransactionsPage = () => {
     { key: 'customerName', label: 'Customer' },
     { key: 'customerMobile', label: 'Mobile' },
     { key: 'amount', label: 'Amount', render: (row) => formatCurrency(row.amount) },
-    { 
-      key: 'status', 
+    {
+      key: 'status',
       label: 'Status',
-      render: (row) => <span className={`table-status status-${row.status}`}>{row.status}</span>
+      render: (row) => {
+        const s = (row.status || '').toLowerCase();
+        const cls = s === 'success' ? 'bg-green-100 text-green-800' : s === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800';
+        return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>{row.status}</span>;
+      }
     },
     { key: 'createdAt', label: 'Date', render: (row) => formatDate(row.createdAt) },
   ];
 
   return (
     <PageLayout title="Transactions">
-      {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--spacing-lg)' }}>{error}</div>}
+      {error && <div className="text-red-600 mb-4">{error}</div>}
 
       <Card>
-        <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)', alignItems: 'flex-end' }}>
-          <div style={{ flex: 1, maxWidth: '200px' }}>
-            <Select
-              label="Filter by Type"
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              options={[
-                { label: 'All Types', value: '' },
-                ...TRANSACTION_TYPES.map((t) => ({ label: t, value: t })),
-              ]}
-            />
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-4">
+          <div className="flex gap-3 w-full sm:w-auto">
+            <div className="w-full sm:w-48">
+              <Select
+                label="Filter by Type"
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                options={[
+                  { label: 'All Types', value: '' },
+                  ...TRANSACTION_TYPES.map((t) => ({ label: t, value: t })),
+                ]}
+              />
+            </div>
+            <div className="w-full sm:w-48">
+              <Select
+                label="Filter by Status"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                options={[
+                  { label: 'All Status', value: '' },
+                  ...TRANSACTION_STATUS.map((s) => ({ label: s, value: s })),
+                ]}
+              />
+            </div>
           </div>
-          <div style={{ flex: 1, maxWidth: '200px' }}>
-            <Select
-              label="Filter by Status"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              options={[
-                { label: 'All Status', value: '' },
-                ...TRANSACTION_STATUS.map((s) => ({ label: s, value: s })),
-              ]}
-            />
+
+          <div>
+            <Button variant="primary" onClick={() => navigate('/retailer/transactions/create')}>
+              + New Transaction
+            </Button>
           </div>
-          <Button variant="primary" onClick={() => navigate('/retailer/transactions/create')}>
-            + New Transaction
-          </Button>
         </div>
 
         <Table 

@@ -8,6 +8,8 @@ import Input from '../../components/common/Input';
 import Loader from '../../components/common/Loader';
 import axiosInstance from '../../api/axios';
 import { formatDate, apiErrorMessage } from '../../utils/helpers';
+import { useToast } from '../../context/ToastContext';
+import { useConfirm } from '../../context/ConfirmContext';
 
 export const DistributorListPage = () => {
   const navigate = useNavigate();
@@ -31,6 +33,8 @@ export const DistributorListPage = () => {
     };
     fetchDistributors();
   }, []);
+  const { showToast } = useToast();
+  const showConfirm = useConfirm();
 
   const handleSearch = (value) => {
     setSearch(value);
@@ -43,14 +47,15 @@ export const DistributorListPage = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this distributor?')) {
-      try {
-        await axiosInstance.delete(`/users/${id}`);
-        setDistributors(distributors.filter((d) => d._id !== id));
-        setFilteredData(filteredData.filter((d) => d._id !== id));
-      } catch (err) {
-        alert(apiErrorMessage(err));
-      }
+    const confirm = await showConfirm('Are you sure you want to delete this distributor?');
+    if (!confirm) return;
+
+    try {
+      await axiosInstance.delete(`/users/${id}`);
+      setDistributors(distributors.filter((d) => d._id !== id));
+      setFilteredData(filteredData.filter((d) => d._id !== id));
+    } catch (err) {
+      showToast(apiErrorMessage(err), { type: 'error' });
     }
   };
 
@@ -67,7 +72,7 @@ export const DistributorListPage = () => {
         d.phone.includes(search)
       ));
     } catch (err) {
-      alert(apiErrorMessage(err));
+      showToast(apiErrorMessage(err), { type: 'error' });
     }
   };
 
@@ -78,10 +83,13 @@ export const DistributorListPage = () => {
     { key: 'email', label: 'Email' },
     { key: 'phone', label: 'Phone' },
     { key: 'commissionPercent', label: 'Commission %' },
-    { 
-      key: 'isActive', 
+    {
+      key: 'isActive',
       label: 'Status',
-      render: (row) => <span className={`table-status status-${row.isActive ? 'active' : 'inactive'}`}>{row.isActive ? 'Active' : 'Inactive'}</span>
+      render: (row) => {
+        const cls = row.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700';
+        return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>{row.isActive ? 'Active' : 'Inactive'}</span>;
+      }
     },
     { key: 'address', label: 'Address' },
     { 
@@ -92,7 +100,7 @@ export const DistributorListPage = () => {
   ];
 
   const renderActions = (row) => (
-    <div className="table-actions">
+    <div className="flex gap-2">
       <Button variant="secondary" onClick={() => navigate(`/admin/users/${row._id}/edit`)}>
         Edit
       </Button>
@@ -110,19 +118,22 @@ export const DistributorListPage = () => {
 
   return (
     <PageLayout title="Distributors">
-      {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--spacing-lg)' }}>{error}</div>}
+      {error && <div className="text-red-600 mb-4">{error}</div>}
 
       <Card>
-        <div className="section-actions">
-          <Input
-            placeholder="Search by name, email, or phone..."
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            style={{ maxWidth: '300px' }}
-          />
-          <Button variant="primary" onClick={() => navigate('/admin/users/create')}>
-            + New Distributor
-          </Button>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div className="w-full sm:w-72">
+            <Input
+              placeholder="Search by name, email, or phone..."
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </div>
+          <div>
+            <Button variant="primary" onClick={() => navigate('/admin/users/create')}>
+              + New Distributor
+            </Button>
+          </div>
         </div>
 
         <Table 

@@ -31,15 +31,15 @@ export const DistributorRetailerFormPage = () => {
         try {
           const response = await axiosInstance.get(`/users/${id}`);
           const user = response.data.data;
-          setFormData({
-            ...formData,
+          setFormData((prev) => ({
+            ...prev,
             name: user.name,
             email: user.email,
             phone: user.phone,
             address: user.address,
             commissionPercent: user.commissionPercent || 0,
             isActive: user.isActive,
-          });
+          }));
         } catch (err) {
           setMainError(apiErrorMessage(err));
         } finally {
@@ -48,7 +48,7 @@ export const DistributorRetailerFormPage = () => {
       };
       fetchRetailer();
     }
-  }, [id]);
+  }, [id, isEdit]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -97,22 +97,10 @@ export const DistributorRetailerFormPage = () => {
   return (
     <PageLayout title={isEdit ? 'Edit Retailer' : 'Create Retailer'}>
       <Card>
-        {mainError && (
-          <div
-            style={{
-              backgroundColor: 'rgba(186, 26, 26, 0.1)',
-              color: 'var(--error)',
-              padding: 'var(--spacing-md)',
-              borderRadius: 'var(--radius-md)',
-              marginBottom: 'var(--spacing-lg)',
-            }}
-          >
-            {mainError}
-          </div>
-        )}
+          {mainError && <div className="bg-red-50 text-red-700 p-3 rounded mb-4">{mainError}</div>}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-row">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label="Name"
               name="name"
@@ -145,7 +133,7 @@ export const DistributorRetailerFormPage = () => {
             />
           )}
 
-          <div className="form-row">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label="Phone"
               name="phone"
@@ -172,20 +160,21 @@ export const DistributorRetailerFormPage = () => {
           />
 
           {isEdit && (
-            <div className="form-group">
-              <label>
+            <div>
+              <label className="inline-flex items-center">
                 <input
+                  className="h-4 w-4 text-primary rounded"
                   type="checkbox"
                   name="isActive"
                   checked={formData.isActive}
                   onChange={handleChange}
                 />
-                <span style={{ marginLeft: 'var(--spacing-md)' }}>Active</span>
+                <span className="ml-3">Active</span>
               </label>
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-lg)' }}>
+          <div className="flex gap-3 mt-4">
             <Button variant="primary" type="submit" disabled={submitting}>
               {submitting ? 'Saving...' : 'Save'}
             </Button>

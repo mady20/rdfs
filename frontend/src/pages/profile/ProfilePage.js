@@ -6,10 +6,8 @@ import Button from '../../components/common/Button';
 import Loader from '../../components/common/Loader';
 import axiosInstance from '../../api/axios';
 import { apiErrorMessage } from '../../utils/helpers';
-import { useAuth } from '../../context/AuthContext';
 
 export const ProfilePage = () => {
-  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -73,35 +71,11 @@ export const ProfilePage = () => {
   return (
     <PageLayout title="My Profile">
       <Card>
-        {error && (
-          <div
-            style={{
-              backgroundColor: 'rgba(186, 26, 26, 0.1)',
-              color: 'var(--error)',
-              padding: 'var(--spacing-md)',
-              borderRadius: 'var(--radius-md)',
-              marginBottom: 'var(--spacing-lg)',
-            }}
-          >
-            {error}
-          </div>
-        )}
+        {error && <div className="bg-red-50 text-red-700 p-3 rounded mb-4">{error}</div>}
 
-        {success && (
-          <div
-            style={{
-              backgroundColor: 'rgba(34, 197, 94, 0.1)',
-              color: '#22c55e',
-              padding: 'var(--spacing-md)',
-              borderRadius: 'var(--radius-md)',
-              marginBottom: 'var(--spacing-lg)',
-            }}
-          >
-            {success}
-          </div>
-        )}
+        {success && <div className="bg-green-50 text-green-700 p-3 rounded mb-4">{success}</div>}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
           <Input
             label="Name"
             name="name"
@@ -116,7 +90,6 @@ export const ProfilePage = () => {
             type="email"
             value={formData.email}
             disabled
-            style={{ opacity: 0.6 }}
           />
 
           <Input
@@ -138,7 +111,6 @@ export const ProfilePage = () => {
             name="role"
             value={formData.role}
             disabled
-            style={{ opacity: 0.6 }}
           />
 
           <Button variant="primary" type="submit" disabled={submitting}>

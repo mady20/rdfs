@@ -33,8 +33,8 @@ Note: This project now uses Tailwind CSS. Post-install, the build will run PostC
 
 ```
 src/
-├── assets/                 # Stylesheets
-│   └── styles/            # CSS files (variables, global, layout, forms, tables, dashboard)
+├── assets/                 # Assets like images and styles
+│   └── styles/            # Tailwind entry (`index.css`) and archived legacy styles in `styles/legacy/`
 ├── api/                   # API client
 │   └── axios.js          # Axios instance with interceptors
 ├── components/           # React components

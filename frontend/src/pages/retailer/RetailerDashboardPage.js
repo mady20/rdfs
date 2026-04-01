@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PageLayout from '../../components/layout/PageLayout';
 import Card from '../../components/common/Card';
+import Button from '../../components/common/Button';
 import Table from '../../components/common/Table';
 import Loader from '../../components/common/Loader';
 import axiosInstance from '../../api/axios';
 import { formatDate, formatCurrency, apiErrorMessage } from '../../utils/helpers';
 
 export const RetailerDashboardPage = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -88,8 +91,8 @@ export const RetailerDashboardPage = () => {
         <aside className="lg:col-span-1 space-y-4">
           <Card title="Quick Actions">
             <div className="flex flex-col gap-3">
-              <button className="table-action-btn table-action-btn-primary">Create Transaction</button>
-              <button className="table-action-btn table-action-btn-secondary">View Ledger</button>
+              <Button variant="primary" onClick={() => navigate('/retailer/transactions/create')}>Create Transaction</Button>
+              <Button variant="secondary" onClick={() => navigate('/retailer/ledger')}>View Ledger</Button>
             </div>
           </Card>
 

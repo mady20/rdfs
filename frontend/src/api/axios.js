@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -8,6 +8,11 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+let unauthorizedHandler = null;
+export const setUnauthorizedHandler = (handler) => {
+  unauthorizedHandler = handler;
+};
 
 axiosInstance.interceptors.request.use(
   (config) => {
@@ -26,7 +31,18 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      if (typeof unauthorizedHandler === 'function') {
+        try {
+          unauthorizedHandler();
+        } catch (e) {
+          // If handler fails, fallback to hard redirect
+          // eslint-disable-next-line no-console
+          console.error('Unauthorized handler threw an error', e);
+          window.location.href = '/login';
+        }
+      } else {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

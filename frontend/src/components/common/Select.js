@@ -11,11 +11,11 @@ export const Select = ({
   required = false,
 }) => {
   return (
-    <div className="form-group">
+    <div className="mb-4">
       {label && (
-        <label htmlFor={name}>
+        <label htmlFor={name} className="block text-sm font-medium text-on-surface mb-1">
           {label}
-          {required && <span style={{ color: 'var(--error)' }}>*</span>}
+          {required && <span className="text-error ml-1">*</span>}
         </label>
       )}
       <select
@@ -33,7 +33,7 @@ export const Select = ({
           </option>
         ))}
       </select>
-      {error && <span className="form-error-message">{error}</span>}
+      {error && <span className="text-sm text-error mt-1 block">{error}</span>}
     </div>
   );
 };

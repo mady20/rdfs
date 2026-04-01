@@ -9,6 +9,7 @@ import Button from '../../components/common/Button';
 import Loader from '../../components/common/Loader';
 import axiosInstance from '../../api/axios';
 import { formatCurrency, formatDate, apiErrorMessage } from '../../utils/helpers';
+import { useToast } from '../../context/ToastContext';
 
 export const WalletManagementPage = () => {
   const [wallets, setWallets] = useState([]);
@@ -36,6 +37,7 @@ export const WalletManagementPage = () => {
     };
     fetchWallets();
   }, []);
+  const { showToast } = useToast();
 
   const handleOpenModal = async (wallet) => {
     setSelectedWallet(wallet);
@@ -51,7 +53,7 @@ export const WalletManagementPage = () => {
 
   const handleAdjustWallet = async () => {
     if (!adjustAmount || !adjustDescription) {
-      alert('Please fill all fields');
+      showToast('Please fill all fields', { type: 'error' });
       return;
     }
 
@@ -82,7 +84,7 @@ export const WalletManagementPage = () => {
       setAdjustAmount('');
       setAdjustDescription('');
     } catch (err) {
-      alert(apiErrorMessage(err));
+      showToast(apiErrorMessage(err), { type: 'error' });
     } finally {
       setAdjusting(false);
     }
@@ -115,7 +117,7 @@ export const WalletManagementPage = () => {
 
   return (
     <PageLayout title="Wallet Management">
-      {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--spacing-lg)' }}>{error}</div>}
+      {error && <div className="text-red-600 mb-4">{error}</div>}
 
       <Card title="All Wallets">
         <Table 
@@ -135,7 +137,7 @@ export const WalletManagementPage = () => {
           setLedgerData([]);
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+        <div className="flex flex-col gap-4">
           <div>
             <strong>Current Balance: </strong>
             {formatCurrency(selectedWallet?.balance || 0)}
@@ -166,15 +168,17 @@ export const WalletManagementPage = () => {
             required
           />
 
-          <Button 
-            variant="primary" 
-            onClick={handleAdjustWallet}
-            disabled={adjusting}
-          >
-            {adjusting ? 'Processing...' : 'Adjust'}
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              variant="primary" 
+              onClick={handleAdjustWallet}
+              disabled={adjusting}
+            >
+              {adjusting ? 'Processing...' : 'Adjust'}
+            </Button>
+          </div>
 
-          <div style={{ marginTop: 'var(--spacing-lg)' }}>
+          <div className="mt-4">
             <h4>Recent Ledger Entries</h4>
             <Table 
               columns={ledgerColumns} 
